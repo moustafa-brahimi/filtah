@@ -1,0 +1,162 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Filtah\n"
+"POT-Creation-Date: 2024-04-04 07:51+0100\n"
+"PO-Revision-Date: 2024-04-04 07:51+0100\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5);\n"
+"X-Generator: Poedit 2.2\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-Flags-xgettext: --add-comments=translators:\n"
+"X-Poedit-WPHeader: filtah.php\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
+"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;"
+"_n_noop:1,2;_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.js\n"
+
+#: filtah.php:44 filtah.php:45
+msgid ""
+"Are you sure to start generating replies for all the comments ? don't close "
+"this window untill the operation is done"
+msgstr ""
+"هل أنت متأكد من بدأ عملية إنشاء ردود لكل التعليقات ؟ لا تغلق هاته النافذة "
+"حتى تنتهي العملية"
+
+#: filtah.php:106 filtah.php:107
+msgid "Chat Gpt"
+msgstr ""
+
+#: filtah.php:144
+msgid ""
+"a visitor left a comment on my website, reply to it in JSON has response: "
+"string"
+msgstr "هناك زائر علق على موقعي , قم بالرد عليه بصيغة JSON response: string"
+
+#: filtah.php:145
+#, php-format
+msgid "Article Content: \"%s\""
+msgstr "محتوى المقالة : \"%s\""
+
+#: filtah.php:146
+#, php-format
+msgid "Comment Content: \"%s\""
+msgstr "محتوى التعليق : \"%s\""
+
+#: lib/dash.php:7 lib/dash.php:26
+msgid "Filtah Settings"
+msgstr "إعدادات فلتة"
+
+#. Plugin Name of the plugin/theme
+#: lib/dash.php:7 parts/deactivation-form.php:5
+msgid "Filtah"
+msgstr "فلتة"
+
+#: lib/dash.php:41
+msgid "Edit Replier Profile"
+msgstr "تعديل بروفايل الرد"
+
+#: lib/dash.php:46
+msgid "To edit "
+msgstr "لتعديل "
+
+#: lib/dash.php:46
+msgid "The comments profile info"
+msgstr "حساب الردود"
+
+#: lib/dash.php:55
+msgid "Reply to all the exisiting comments"
+msgstr "إنشاء ردود لكل التعليقات"
+
+#: lib/dash.php:59
+msgid "Generate"
+msgstr "إنشاء"
+
+#: lib/dash.php:61
+msgid ""
+"This may take a while, don't close the window untill the operation is done"
+msgstr "هذا قد يأخذ فترة, لا تغلق النافذة حتى تنتهي العملية"
+
+#: lib/dash.php:71
+msgid "Save Changes"
+msgstr "حفظ التغييرات"
+
+#: lib/dash.php:87
+msgid "Filtah Options"
+msgstr "خيارات فلتة"
+
+#: lib/dash.php:90
+msgid "Chat GPT API Key"
+msgstr "إعدادات فلتة"
+
+#: lib/dash.php:91
+msgid "Default Status"
+msgstr "الحالة الافتراضية"
+
+#: lib/dash.php:106
+msgid "Here's a tutorial on"
+msgstr "إليك فيديو يشرح"
+
+#: lib/dash.php:106
+msgid "how to get GPT API key?"
+msgstr "كيف تحصل على مفتاح GPT API"
+
+#: lib/dash.php:116
+msgid "Approved"
+msgstr "موافق عليه"
+
+#: lib/dash.php:117
+msgid "Unapproved"
+msgstr "بإنتظار المراجعة"
+
+#: lib/dash.php:140
+msgid "Generate A reply"
+msgstr ""
+
+#: lib/dash.php:164
+msgid "Filtah requires a gpt api key to function properly !"
+msgstr "إضافة فلتة تحتاج الى مفتاح GPT API لتشتغل !"
+
+#: lib/dash.php:164
+msgid "Go to settings"
+msgstr "ولوج إلى الإعدادات"
+
+#: parts/deactivation-form.php:7
+msgid "Before deactivating Filtah, do you wanna keep the existing replies ?"
+msgstr "قبل تعطيل فلتة ؟ هل تريد أن تبقي الردود الحالية ؟"
+
+#: parts/deactivation-form.php:12
+msgid "Keep the existing replies "
+msgstr "أبقي الردود الحالية "
+
+#: parts/deactivation-form.php:17
+msgid "Deactivate"
+msgstr "تعطيل"
+
+#: parts/deactivation-form.php:18
+msgid "Cancel"
+msgstr "إلغاء"
+
+#. Plugin URI of the plugin/theme
+msgid "https://www.usuual.com/filtah"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid ""
+"Filtah is a wordpress plugin that uses GPT to reply to your blog comments <3"
+msgstr "فلتة هي أضافة تستخدم شات GPT للرد على تعليقات موقعك"
+
+#. Author of the plugin/theme
+msgid "Abderezzak khatiri"
+msgstr "عبد الرزاق خثيري"
+
+#. Author URI of the plugin/theme
+msgid "https://www.usuual.com/"
+msgstr ""

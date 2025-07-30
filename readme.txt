@@ -83,9 +83,11 @@ If the AI service is unavailable, the plugin will fail silently and no automatic
 
 == Screenshots ==
 
-1. Main settings page with AI provider selection
-2. Comment management showing AI-generated replies
-3. Bulk processing interface
+1. The main plugin settings page inside the WordPress admin.
+2. Confirmation dialog asking whether to keep replies when deactivating the plugin.
+3. Example showing generated replies in multiple languages.
+4. Dialog box for generating replies for all existing comments.
+5. A customizable reply author profile, just like any other user profile.
 
 == Changelog ==
 

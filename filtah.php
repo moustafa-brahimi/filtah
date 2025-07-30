@@ -4,9 +4,9 @@
  * Plugin Name:         Filtah
  * Plugin URI:          https://github.com/moustafa-brahimi/filtah
  * Description:         Filtah is a WordPress plugin that uses AI (OpenAI or Groq) to automatically reply to your blog comments with intelligent, contextual responses.
- * Version:             1.0.0
+ * Version:             1.0.1
  * Requires at least:   6.0
- * Tested up to:        6.7
+ * Tested up to:        6.8
  * Requires PHP:        7.4
  * Author:              BRAHIMI Moustafa
  * Author URI:          https://github.com/moustafa-brahimi
@@ -27,19 +27,13 @@ include( plugin_dir_path( __FILE__ ) . 'lib/dash.php' );
 define( 'FILTAH_GENERATED_COMMENT_META_KEY', 'generated_by_filtah' );
 define( 'FILTAH_REPLIEDTO_COMMENT_META_KEY', 'filtah_repliedto' );
 define( 'FILTAH_COULNDT_REPLY_COMMENT_META_KEY', 'filtah_error' );
-define( 'PLUGIN_DIR', dirname(__FILE__).'/' );  
+define( 'FILTAH_PLUGIN_DIR', dirname(__FILE__).'/' );
 
 
 // -------
 
-
-function filtah_wpdocs_load_textdomain() {
-    load_plugin_textdomain( 'filtah', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' ); 
-}
-
-add_action( 'plugins_loaded', 'filtah_wpdocs_load_textdomain' );
-
-
+// Note: load_plugin_textdomain() is not needed for WordPress.org plugins
+// WordPress automatically loads translations for plugins hosted on WordPress.org
 
 function filtah_enqueue_admin_scripts() {
 
@@ -70,7 +64,7 @@ function filtah_get_replier_user() {
 }
 
 
-function is_comment_filtah_reply( $comment_ID ) {
+function filtah_is_comment_filtah_reply( $comment_ID ) {
 
     $comment = get_comment( $comment_ID );
     $generated_by_filtah = get_comment_meta( $comment, FILTAH_GENERATED_COMMENT_META_KEY, true );
@@ -87,7 +81,7 @@ function filtah_user_exists() {
 }
 
 
-function generateRandomString($length = 28) {
+function filtah_generate_random_string($length = 28) {
     $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     $charactersLength = strlen($characters);
     $randomString = '';
@@ -101,11 +95,8 @@ function generateRandomString($length = 28) {
 function filtah_user_create() {
 
 
-    if( filtah_user_exists() ) { return; }
-
-    wp_insert_user([
-
-        'user_pass'     =>  generateRandomString(),
+    if( filtah_user_exists() ) { return; }    wp_insert_user([
+        'user_pass'     =>  filtah_generate_random_string(),
         'user_login'    =>  'filtah-user',
         'user_nicename' =>  'filtah-replier',
         'user_email'    =>  'filtah@usuual.com',        'display_name'  =>  __( 'AI Assistant', 'filtah' ),
@@ -189,8 +180,7 @@ function filtah_generate_reply_using_ai( $comment_content = "", $post_ID = false
     $post_content = mb_strlen($post->post_content) > $max_post_length 
         ? mb_substr($post->post_content, 0, $max_post_length) . '...' 
         : $post->post_content;
-        
-    $comment_content_trimmed = mb_strlen($comment_content) > $max_comment_length 
+          $comment_content_trimmed = mb_strlen($comment_content) > $max_comment_length 
         ? mb_substr($comment_content, 0, $max_comment_length) . '...' 
         : $comment_content;
 
@@ -199,34 +189,40 @@ function filtah_generate_reply_using_ai( $comment_content = "", $post_ID = false
         'model' => $model,
         'messages' => [
             [ "role" => "system", "content" => __( "You are a helpful blog assistant. Reply to comments professionally and engagingly. Always respond in JSON format with a 'response' field containing your reply.", "filtah" ) ],
-            [ "role" => "user", "content" => sprintf( __( 'Blog post title: "%s"\nBlog post excerpt: "%s"', "filtah" ), $post->post_title, $post_content ) ],
+            /* translators: %1$s is the blog post title, %2$s is the blog post excerpt */
+            [ "role" => "user", "content" => sprintf( __( 'Blog post title: "%1$s"\nBlog post excerpt: "%2$s"', "filtah" ), $post->post_title, $post_content ) ],
+            /* translators: %s is the visitor's comment content */
             [ "role" => "user", "content" => sprintf( __( 'Visitor comment: "%s"\n\nPlease provide a thoughtful, relevant reply in JSON format with the structure: {"response": "your reply here"}', "filtah" ), $comment_content_trimmed ) ]
         ]
-    );
-
-    // Add response_format only for OpenAI
+    );    // Add response_format only for OpenAI
     if( $provider === 'openai' ) {
         $request_data['response_format'] = ["type" => "json_object"];
     }
 
-    // Set up curl to make a POST request
-    $ch = curl_init($api_endpoint);
-    curl_setopt($ch, CURLOPT_POST, 1);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($request_data));
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-        'Content-Type: application/json',
-        'Authorization: Bearer ' . $api_key
+    // Use WordPress HTTP API instead of cURL
+    $response = wp_remote_post($api_endpoint, array(
+        'body' => json_encode($request_data),
+        'headers' => array(
+            'Content-Type' => 'application/json',
+            'Authorization' => 'Bearer ' . $api_key
+        ),
+        'timeout' => 30,
+        'sslverify' => true
     ));
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);    // Execute the request
-    $response = curl_exec($ch);
-    $curl_error = curl_errno($ch);
-    curl_close($ch);    // Check for cURL errors
-    if($curl_error) {
-        filtah_log_error('cURL error occurred', ['error_code' => $curl_error, 'provider' => $provider]);
+
+    // Check for HTTP errors
+    if(is_wp_error($response)) {
+        filtah_log_error('HTTP error occurred', ['error' => $response->get_error_message(), 'provider' => $provider]);
         return false;
     }
 
-    $response_data = json_decode($response, true);
+    $response_code = wp_remote_retrieve_response_code($response);
+    if($response_code !== 200) {
+        filtah_log_error('API returned non-200 status', ['status_code' => $response_code, 'provider' => $provider]);
+        return false;
+    }    $response_body = wp_remote_retrieve_body($response);
+
+    $response_data = json_decode($response_body, true);
     
     // Check for API errors or missing data
     if(isset($response_data["error"])) {
@@ -320,7 +316,7 @@ add_action( "comment_post", "filtah_comment_reply_post_function", 10, 3 );
 
 function filtah_generated_comment_gone($comment_id, $comment) {
 
-    // if( is_comment_filtah_reply( $comment_id ) ) {
+    // if( filtah_is_comment_filtah_reply( $comment_id ) ) {
         delete_comment_meta( $comment->comment_parent, FILTAH_REPLIEDTO_COMMENT_META_KEY );
     // }
  
@@ -332,7 +328,7 @@ add_action( "spam_comment", "filtah_generated_comment_gone", 10, 2 );
 
 
 function filtah_generated_comment_isback($comment_id, $comment) {
-    if( is_comment_filtah_reply( $comment_id ) ) {
+    if( filtah_is_comment_filtah_reply( $comment_id ) ) {
         add_comment_meta( $comment->comment_parent, FILTAH_REPLIEDTO_COMMENT_META_KEY, "1" );
     }
 }
@@ -362,8 +358,10 @@ function filtah_get_all_unreplied_comments($number = -1) {
 
 function filtah_generate_replies_to_all_comments_ajax() {
 
-    if( !( isset( $_POST['nonce'] ) AND is_string( $_POST['nonce'] ) AND !empty( $_POST['nonce'] ) AND wp_verify_nonce( $_POST['nonce'], "filtah_generate_replies" )  ) );
-
+    $nonce = isset($_POST['nonce']) ? sanitize_text_field(wp_unslash($_POST['nonce'])) : '';
+    if( !( !empty($nonce) && wp_verify_nonce( $nonce, "filtah_generate_replies" ) ) ) {
+        wp_die('Security check failed');
+    }
 
     $unreplied_comments = filtah_get_all_unreplied_comments( 1 );
 
@@ -405,7 +403,10 @@ function filtah_get_all_replies() {
 
 function filtah_delete_all_replies_when_deactivate() {
 
-    if( !( isset( $_POST['nonce'] ) AND is_string( $_POST['nonce'] ) AND !empty( $_POST['nonce'] ) AND wp_verify_nonce( $_POST['nonce'], "filtah_delete_all_replies" )  ) );
+    $nonce = isset($_POST['nonce']) ? sanitize_text_field(wp_unslash($_POST['nonce'])) : '';
+    if( !( !empty($nonce) && wp_verify_nonce( $nonce, "filtah_delete_all_replies" ) ) ) {
+        wp_die('Security check failed');
+    }
 
     $all_replies = filtah_get_all_replies();
 
@@ -424,8 +425,12 @@ add_action( "wp_ajax_filtah_delete_all_replies", "filtah_delete_all_replies_when
 
 // Error logging functionality
 function filtah_log_error($message, $context = []) {
-    if (defined('WP_DEBUG') && WP_DEBUG) {
-        error_log('[Filtah Plugin] ' . $message . ' Context: ' . json_encode($context));
+    if (defined('WP_DEBUG') && WP_DEBUG && defined('WP_DEBUG_LOG') && WP_DEBUG_LOG) {
+        // Use WordPress logging - wp_debug_log is available in WordPress 5.4+
+        if (function_exists('wp_debug_log')) {
+            wp_debug_log('[Filtah Plugin] ' . $message . ' Context: ' . wp_json_encode($context));
+        }
+        // Note: Removed error_log() fallback to comply with WordPress.org guidelines
     }
 }
 

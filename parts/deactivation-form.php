@@ -1,3 +1,7 @@
+<?php
+// Prevent direct file access
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+?>
 <div class="filtah-deactivation hidden" id="filtah-deactivation">
 
     <div class="filtah-deactivation__container">

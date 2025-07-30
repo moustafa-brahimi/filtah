@@ -1,4 +1,6 @@
-<?php 
+<?php
+// Prevent direct file access
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 
 function filtah_add_sub_menu_page() {
@@ -52,11 +54,9 @@ function filtah_sub_menu_page() {
                     <tr>
                         <th scope="row">
                             <?php esc_html_e( "Reply to all the exisiting comments", "filtah" ); ?>
-                        </th>
-
-                        <td>
+                        </th>                        <td>
                             <?php submit_button( __("Generate", "filtah"), "secondary", "filtah-generate-reply-to-all-exisiting-comments", false ); ?>
-                            <img id="filtah-generate-reply-to-all-existing-comments-spinner" class="hidden" src="<?php echo get_admin_url(); ?>/images/spinner.gif" />
+                            <img id="filtah-generate-reply-to-all-existing-comments-spinner" class="hidden" src="<?php echo esc_url( get_admin_url() ); ?>/images/spinner.gif" />
                             <p id="filtah-generate-reply-to-all-existing-comments-note" class="description filtah-generate-reply-to-all-existing-comments-note"><?php esc_html_e( "This may take a while, don't close the window untill the operation is done", "filtah" ); ?></p>
                             
                         </td>
@@ -123,12 +123,10 @@ function filtah_ai_provider_field_callback() {
     $options = [
         'openai'  =>  __('OpenAI (ChatGPT)', 'filtah'),
         'groq'    =>  __( 'Groq', 'filtah' )
-    ];
-
-    printf( "<select id='%s' name='%s'>", 'filtah-ai-provider', 'filtah_ai_provider' );
+    ];    printf( "<select id='%s' name='%s'>", 'filtah-ai-provider', 'filtah_ai_provider' );
     
     foreach( $options as $value => $title ):
-        printf( "<option value='%s' %s>%s</option>", esc_attr($value), ( $value == $saved_val ? "selected" : "" ), $title );
+        printf( "<option value='%s' %s>%s</option>", esc_attr($value), ( $value == $saved_val ? "selected" : "" ), esc_html($title) );
     endforeach;
     
     printf( "</select>" );
@@ -161,11 +159,9 @@ function filtah_reply_default_status_field_callback() {
         'unapproved'    =>  __( 'Unapproved', 'filtah' )
     ];
 
-    printf( "<select id='%s' name='%s'>", 'filtah-reply-default-status', 'filtah_reply_default_status' );
+    printf( "<select id='%s' name='%s'>", 'filtah-reply-default-status', 'filtah_reply_default_status' );    foreach( $options as $value => $title ):
 
-    foreach( $options as $value => $title ):
-
-        printf( "<option value='%s' %s>%s</option>", esc_attr($value), ( $value == $saved_val ? "selected" : "" ), $title );
+        printf( "<option value='%s' %s>%s</option>", esc_attr($value), ( $value == $saved_val ? "selected" : "" ), esc_html($title) );
 
     endforeach;
     
@@ -198,9 +194,8 @@ function filtah_ai_model_field_callback() {
     $current_model = $saved_model ?: $default_model;
 
     printf( "<select id='%s' name='%s'>", 'filtah-ai-model', 'filtah_ai_model' );
-    
-    foreach( $models as $value => $title ):
-        printf( "<option value='%s' %s>%s</option>", esc_attr($value), ( $value == $current_model ? "selected" : "" ), $title );
+      foreach( $models as $value => $title ):
+        printf( "<option value='%s' %s>%s</option>", esc_attr($value), ( $value == $current_model ? "selected" : "" ), esc_html($title) );
     endforeach;
     
     printf( "</select>" );
@@ -226,7 +221,7 @@ function filtah_privacy_consent_field_callback() {
 
 function filtah_modify_comments_list_row_actions( $actions, $comment ) {
     
-    if( !is_comment_filtah_reply( $comment->ID ) ) {
+    if( !filtah_is_comment_filtah_reply( $comment->ID ) ) {
         $actions["filtah-generate-reply"]   =   esc_html__( "Generate A reply", "filtah" );
     }
 
@@ -241,7 +236,7 @@ add_filter( 'comment_row_actions', 'filtah_modify_comments_list_row_actions', 10
 
 function filtah_footer_function() {
     // echo '<div>' . __( 'This will be inserted at the bottom of admin page', 'filtah' ) . '</div>';
-    include PLUGIN_DIR . "./parts/deactivation-form.php";
+    include FILTAH_PLUGIN_DIR . "./parts/deactivation-form.php";
 }
 add_action('admin_footer', 'filtah_footer_function');
 
@@ -253,9 +248,8 @@ function filtah_missing_requirements_error() {
     $privacy_consent = get_option( 'filtah_privacy_consent', '' );
     
     if( !( (bool) $api_key ) || $privacy_consent !== '1' ) {
-        ?>
-        <div class="notice notice-error">
-        <p><?php _e( 'Filtah requires an API key and privacy consent to function properly!', 'filtah' ); ?> <a href="<?php echo esc_url( admin_url('options-general.php?page=filtah-settings') ); ?>"><?php esc_html_e( "Go to settings", "filtah" ); ?></a></p>
+        ?>        <div class="notice notice-error">
+        <p><?php esc_html_e( 'Filtah requires an API key and privacy consent to function properly!', 'filtah' ); ?> <a href="<?php echo esc_url( admin_url('options-general.php?page=filtah-settings') ); ?>"><?php esc_html_e( "Go to settings", "filtah" ); ?></a></p>
         </div>
         <?php
     }

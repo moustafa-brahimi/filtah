@@ -1,9 +1,10 @@
 === Filtah ===
-Contributors: brahimi-dev
+Plugin Name:         Filtah
+Contributors: usuual
 Tags: comments, ai, automation, replies
 Requires at least: 6.0
-Tested up to: 6.7
-Stable tag: 1.0.0
+Tested up to: 6.8
+Stable tag: 1.0.1
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -88,6 +89,12 @@ If the AI service is unavailable, the plugin will fail silently and no automatic
 
 == Changelog ==
 
+= 1.0.1 =
+* Fixed function naming prefixes for WordPress standards compatibility
+* Added direct file access protection to PHP files
+* Updated contributor information
+* General code improvements
+
 = 1.0.0 =
 * Initial release
 * Multi-provider support (OpenAI/Groq)
@@ -98,7 +105,5 @@ If the AI service is unavailable, the plugin will fail silently and no automatic
 * Error logging
 * Multilingual support
 
-== Upgrade Notice ==
 
-= 1.0.0 =
-Initial release of Filtah - AI-powered comment replies for WordPress.
+
